@@ -10,6 +10,17 @@
 <![endif]-->
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript" src="leaflet/leaflet.js"></script>
+<style type="text/css">
+.mw-plusminus-pos{
+	color:#006400;
+}
+.mw-plusminus-neg{
+	color:#8b0000;
+}
+.mw-plusminus-null{
+	color:#aaa;
+}
+</style>
 </head>
 <body>
 <header>
@@ -63,7 +74,7 @@ foreach($namespaces as $namespace){
 			action=>'query',
 			'list'=>'usercontribs',
 			ucuser=>$user,
-			ucprop=>'title|timestamp|ids',
+			ucprop=>'title|timestamp|ids|sizediff',
 			ucnamespace=>$namespace,
 			uclimit=>($limit-$count>500?'max':$limit-$count),
 			format=>'json'
@@ -75,8 +86,11 @@ foreach($namespaces as $namespace){
 		$count+=count($query);
 		foreach($query as $key=>$val){
 			if(array_key_exists($val['title'],$occurr)){
-				if(is_array($occurr[$val['title']])) $occurr[$val['title']]=2;
-				else $occurr[$val['title']]+=1;
+				if(array_key_exists('revid',$occurr[$val['title']])) $occurr[$val['title']]=array(count=>2,sizediff=>$occurr[$val['title']]['sizediff']+$val['sizediff']);
+				else{
+					$occurr[$val['title']]['count']+=1;
+					$occurr[$val['title']]['sizediff']+=$val['sizediff'];
+				}
 			}
 			else $occurr[$val['title']]=$val;
 		}
@@ -115,15 +129,18 @@ foreach($coords as $pageid=>$page){
 			$title=addcslashes($page['title'],'\\\'\"&<>');
 			$title='<strong><a href="'.$baseurl_rel.'/wiki/'.str_replace(' ','_',htmlspecialchars($title)).'">'.$title.'</a></strong>';
 			$edits=$occurr[$page['title']];
-			$numedits=(is_array($edits)?1:$edits);
+			$numedits=(array_key_exists('revid',$edits)?1:$edits['count']);
 			$color=$colors[rand(0,count($colors)-1)];
 			$icon='L.icon({iconUrl:\'//commons.wikimedia.org/wiki/Special:Filepath/Location_dot_'.$color.'.svg\',iconSize:['.($numedits*10).','.($numedits*10).']})';
-			if(is_array($edits) and array_key_exists('revid',$edits)){
+			$sizediff=$edits['sizediff'];
+			$sizedifftag=abs($sizediff)>500?'strong':'span';
+			$sizediff='<'.$sizedifftag.' class="mw-plusminus-'.($sizediff==0?'null':($sizediff>0?'pos':'neg')).'">'.($sizediff>0?'+':'').$sizediff.' byte'.($sizediff==1?'':'s').'</'.$sizedifftag.'>';
+			if(array_key_exists('revid',$edits)){
 				$edits='<a href="'.$baseurl_rel.'/w/index.php?diff='.$edits['revid'].'">1 edit</a>';
 			}
-			else $edits=$edits.' edits';
+			else $edits=$numedits.' edits';
 			if(!array_key_exists($numedits,$markers)) $markers[$numedits]=array();
-			array_push($markers[$numedits],'L.marker(['.$coordinates['lat'].','.$coordinates['lon'].'],{icon:'.$icon.'}).addTo(map).bindPopup(\''.$title.'<br>'.$edits.'\');');
+			array_push($markers[$numedits],'L.marker(['.$coordinates['lat'].','.$coordinates['lon'].'],{icon:'.$icon.'}).addTo(map).bindPopup(\''.$title.'<br>'.$sizediff.' with '.$edits.'\');');
 		}
 	}
 	//else echo chr(10).'// "'.$page['title'].'" has no coordinates';
