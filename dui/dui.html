@@ -1,0 +1,140 @@
+<!--
+
+Deep User Inspector (DUI)
+Copyright (C) 2013 Ricordisamoa
+
+meta.wikimedia.org/wiki/User:Ricordisamoa
+tools.wmflabs.org/ricordisamoa/
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>DUI by Ricordisamoa</title>
+<!--
+Twitter Bootstrap 3.0.0
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<script type="text/javascript" src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+-->
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<!-- g.Raphael - JavaScript charting library
+(the main script needs to be up-to-date) -->
+<script type="text/javascript" src="../lib/g.raphael/g.raphael.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/graphael/0.5.1/g.bar-min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/graphael/0.5.1/g.dot-min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/graphael/0.5.1/g.pie-min.js"></script>
+
+<!-- Leaflet - JavaScript map library -->
+<link rel="stylesheet" href="../lib/leaflet/leaflet.css">
+<!--[if lte IE 8]>
+     <link rel="stylesheet" href="../lib/leaflet/leaflet.ie.css" />
+<![endif]-->
+<script type="text/javascript" src="../lib/leaflet/leaflet.js"></script>
+
+<script type="text/javascript" src="dui.js"></script>
+<style type="text/css">
+body{
+	padding:1em;
+}
+.mw-plusminus-pos{
+	color:#006400;
+}
+.mw-plusminus-neg{
+	color:#8b0000;
+}
+.mw-plusminus-null{
+	color:#aaa;
+}
+.hero-unit+.nav-tabs{
+	display:none;
+}
+footer{
+	float:left;
+	position:static;
+	bottom:1em;
+	display:none;
+}
+#ns-chart svg path.selected{
+	stroke-width:3px!important;
+}
+#punchcard svg circle{
+	fill:#444!important;
+}
+#punchcard svg circle.day-hover{
+	fill:#4183C4!important;
+	z-index:9999!important;
+}
+</style>
+</head>
+<body>
+<div class="hero-unit pagination-centered">
+<h1>Deep User Inspector</h1><br>
+<div id="form">
+	<label for="u">User name: <input type="text" id="u" name="u" placeholder="Jimbo Wales"></label>
+	<label for="p">Project: <input type="text" id="p" name="p" placeholder="en.wikipedia"></label>
+	<p>You are going to run an extremely heavy operation. Do you <b>really</b> want to continue?</p>
+	<a role="button" class="btn btn-large btn-primary" id="init"><i class="icon-white icon-arrow-right"></i> Yes</a>
+</div>
+</div>
+<ul class="nav nav-tabs">
+	<li class="active"><a href="#overview" data-toggle="tab">Overview</a></li>
+	<li><a href="#advanced" data-toggle="tab" data-msg="wikieditor-toolbar-section-advanced">Advanced</a></li>
+	<li><a href="#rights" data-toggle="tab" data-msg="listgrouprights-rights">Rights</a></li>
+	<li><a href="#tags" data-toggle="tab" data-msg="tags-title">Tags</a></li>
+	<li><a href="#uploads" data-toggle="tab" data-msg="statistics-files">Uploads</a></li>
+	<li><a href="#punch-card" data-toggle="tab">Punchcard</a></li>
+	<li><a href="#map" data-toggle="tab">Map</a></li>
+	<li style="float:right;margin-right:12em"><a href="//meta.wikimedia.org/wiki/User_talk:Ricordisamoa" target="_blank">Feedback</a></li>
+</ul>
+<div class="tab-content">
+	<div class="tab-pane active container-fluid" id="overview">
+		<div id="general" class="span3" style="float:left"></div>
+		<div class="span4">
+			<div id="ns-chart"></div>
+		</div>
+		<div id="top-edited" class="span4"></div>
+	</div>
+	<div class="tab-pane container-fluid" id="advanced">
+		<div id="week-chart"></div>
+		<div id="month-chart"></div>
+	</div>
+	<div class="tab-pane container-fluid" id="tags">
+		Warning: only untagged or single-tagged edits are shown.
+		<div id="tag-chart"></div>
+	</div>
+	<div class="tab-pane" id="rights">
+	</div>
+	<div class="tab-pane" id="uploads">
+		<h3>Coming soon! :)</h3>
+	</div>
+	<div class="tab-pane container-fluid" id="punch-card">
+		<div id="punchcard"></div>
+	</div>
+	<div class="tab-pane" id="map">
+	</div>
+</div>
+<footer>
+<span id="credits">Charts powered by <a href="http://g.raphaeljs.com">g.Raphaël</a>. </span>All dates are UTC.
+</footer>
+<a href="//github.com/ricordisamoa/labs/tree/master/dui"><img style="position: fixed; top: 0; right: 0; border: 0;" src="//s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+</body>
+</html>
