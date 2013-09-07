@@ -228,7 +228,10 @@ function getRights(callback){
 			lelimit:'max'
 		},
 		function(data){
-			callback(data.query.logevents);
+			callback($.grep(data.query.logevents,function(el){
+				// hack for old log entries
+				return typeof el.rights!='undefined';
+			}));
 		},
 		'jsonp'
 	);
