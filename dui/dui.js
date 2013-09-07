@@ -732,8 +732,8 @@ function init(){
 					summ=getSummaried(contribs).length;
 					getUploads(function(uploads){
 						$('#general')
-						.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
-						.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
+						.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
+						.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
 						.append('Live edits: '+contribs.length.toLocaleString()+'<br>')
 						.append(typeof editcount=='undefined'?[]:['Deleted edits: '+(editcount-contribs.length).toLocaleString(),'<br>',
 						'<b>Total edits (including deleted): '+editcount.toLocaleString()+'</b>','<br>'])
