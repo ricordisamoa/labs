@@ -539,14 +539,14 @@ function init(){
 					latestContribDate=new Date(contribs[0].timestamp),
 					filtered=getFilteredByNS(contribs,true),
 					nsNumbers=Object.keys(filtered),
-					nsNames=$.map(nsNumbers,function(e){return [namespaceName(e)];}),
+					nsNames=$.map(nsNumbers,function(e){return namespaceName(e)+': '+filtered[e].length+' ('+Math.floor(filtered[e].length/contribs.length*10000)/100+'%)';}),
 					nsContribs=$.map(filtered,function(e){return e.length;}),
 					nsColors=$.map(nsNumbers.sort(function(a,b){return filtered[b].length-filtered[a].length;}),function(e){return ['#'+colors[e]];});
 					firstMonth=yearMonth(firstContribDate);
 					$('.hero-unit').removeClass('hero-unit');
 					$('#form').remove();
 					var nsCanvas = Raphael('ns-chart',520,400),
-					nsChart = nsCanvas.piechart(170, 200, 150, nsContribs, { legend: nsNames, legendpos: 'east', colors: nsColors })
+					nsChart = nsCanvas.piechart(170, 200, 150, nsContribs, { legend: nsNames, legendpos: 'east', colors: nsColors, minPercent: 0 })
 					.hover(function () {
 						this.sector.stop();
 						if(!this.sector[0].classList.contains('selected')) this.sector.scale(1.1, 1.1, this.cx, this.cy);
