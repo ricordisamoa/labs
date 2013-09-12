@@ -18,7 +18,7 @@
 */
 wgUserLanguage=navigator.language;
 function getSymbol(claims){
-	return claims["p246"][0].mainsnak.datavalue.value;
+	return claims["P246"][0].mainsnak.datavalue.value;
 }
 function getClaims(entities,callback){
 	$.get(

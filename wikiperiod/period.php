@@ -73,13 +73,13 @@ foreach($elements as $id => $element){
 	$link='//www.wikidata.org/wiki/'.$id;
 	$anchor='<a href="'.$link.'">'.$id.'</a>';
 	if(!array_key_exists('claims',$element)) die('Claims not found on '.$anchor.'!');
-	if(!array_key_exists('p246',$element['claims'])) die('Chemical symbol not found on '.$anchor.'!');
+	if(!array_key_exists('P246',$element['claims'])) die('Chemical symbol not found on '.$anchor.'!');
 	if(!array_key_exists('descriptions',$element)) die('Descriptions not found on '.$anchor.'!');
 	if(!array_key_exists('en',$element['descriptions'])) die('English description not found on '.$anchor.'!');
 	$desc=$element['descriptions']['en']['value'];
 	preg_match('/(chemical )?element with (an |the |)atomic number (of |)(\d+)\b/',$desc,$matches);
 	$num=intval($matches[4]);
-	$symbol=$element['claims']['p246'][0]['mainsnak']['datavalue']['value'];
+	$symbol=$element['claims']['P246'][0]['mainsnak']['datavalue']['value'];
 	$label=$element['labels'][$userlang]['value'];
 	$final[$num]=array(
 		symbol=>$symbol,
