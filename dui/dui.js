@@ -236,6 +236,32 @@ function getRights(callback){
 		'jsonp'
 	);
 }
+function getVotes(callback){
+	var polls={
+		'Wikivoyage/Logo/2013/R1/Results/JSON':'2013 Wikivoyage logo elections - 1st round',
+		'Wikivoyage/Logo/2013/R2/Results/JSON':'2013 Wikivoyage logo elections - 2nd round'
+	};
+	$.get(
+		'//meta.wikimedia.org/w/api.php',
+		{
+			action:'query',
+			format:'json',
+			titles:Object.keys(polls).join('|'),
+			prop:'revisions',
+			rvprop:'content'
+		},
+		function(data){
+			$.each(data.query.pages,function(pageid,page){
+				var votes=JSON.parse(page.revisions[0]['*'].replace(/^\<nowiki\>|\<\/nowiki\>$/g,''));
+				if(typeof votes[user]=='undefined') votes=[];
+				else votes=votes[user].votes.votesByTimestamp;
+				polls[page.title]={label:polls[page.title],votes:votes};
+			});
+			callback(polls);
+		},
+		'jsonp'
+	);
+}
 function getGeo(contribs,callback){
 	var occurr={};
 	$.each(contribs,function(key,val){
@@ -667,15 +693,16 @@ function init(){
 							}catch(e){}
 						});
 					});
-					$('li>a[href="#map"]').on('show',function(){
+					var hideCreditsOnShow=$('li>a[href="#map"],li>a[href="#votes"]');
+					hideCreditsOnShow.on('show',function(){
 						$('#credits').hide();
-					})
+					});
+					$('a[data-toggle="tab"]').not(hideCreditsOnShow).on('show',function(){
+						$('#credits').show();
+					});
+					$('li>a[href="#map"]')
 					.one('shown',function(){
-						$('#credits').hide();
 						$('#map').append('Loading geodata...');
-						$('a[data-toggle="tab"]').not(this).on('show',function(){
-							$('#credits').show();
-						});
 						var colors=['bisque','black','blue','coral','cyan','darkslategray','deeppink','green','lightgrey','lime','magenta','orange','purple','red','teal','yellow'];
 						getGeo(filterByNS(contribs,0).concat(filterByNS(contribs,6)),function(geodata){
 							if(geodata.length>0){
@@ -730,18 +757,33 @@ function init(){
 					});
 					var ls=longestStreak(contribs),
 					summ=getSummaried(contribs).length;
-					getUploads(function(uploads){
-						$('#general')
-						.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
-						.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
-						.append('Live edits: '+contribs.length.toLocaleString()+'<br>')
-						.append(typeof editcount=='undefined'?[]:['Deleted edits: '+(editcount-contribs.length).toLocaleString(),'<br>',
-						'<b>Total edits (including deleted): '+editcount.toLocaleString()+'</b>','<br>'])
-						.append('<a href="'+wikipath+'Special:Log/upload?user='+user+'">'+messages['statistics-files']+'</a>: '+uploads.length.toLocaleString()+'<br>')
-						.append('Edits with non-empty summary: '+summ.toLocaleString()+' ('+
-						Math.floor((summ/contribs.length)*10000)/100+'%)<br>')
-						.append('Longest streak: '+$.map(ls,function(d){return new Date(d).toUTCString()}).join(' - ')+': '+parseMsg(messages.days,(new Date(ls[1])-new Date(ls[0]))/86400000+1)+'<br>')
-						.append('Executed in '+parseMsg(messages.seconds,Math.floor((new Date().getTime()-editCounterInitDate.getTime())/10)/100)+'.');
+					getVotes(function(polls){
+						console.log(polls);
+						$('#votes')
+						.append($.map(polls,function(poll,page){
+							return [
+								$('<h3>').append($('<a>',{'href':'//meta.wikimedia.org/wiki/'+page,'title':page}).text(poll.label)),
+								poll.votes.length>0?$('<ul>')
+								.append($.map(poll.votes,function(vote){
+									return $('<li>').text(new Date(vote.ts).toUTCString()+' - Voted for '+vote.candidate+' (')
+									.append($('<a>',{'href':'//meta.wikimedia.org/wiki/?diff='+vote.diff,'title':'diff '+vote.diff+' on Meta-Wiki'}).text('diff'))
+									.append(')');
+								})):'Did not vote.'
+							];
+						}));
+						getUploads(function(uploads){
+							$('#general')
+							.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
+							.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
+							.append('Live edits: '+contribs.length.toLocaleString()+'<br>')
+							.append(typeof editcount=='undefined'?[]:['Deleted edits: '+(editcount-contribs.length).toLocaleString(),'<br>',
+							'<b>Total edits (including deleted): '+editcount.toLocaleString()+'</b>','<br>'])
+							.append('<a href="'+wikipath+'Special:Log/upload?user='+user+'">'+messages['statistics-files']+'</a>: '+uploads.length.toLocaleString()+'<br>')
+							.append('Edits with non-empty summary: '+summ.toLocaleString()+' ('+
+							Math.floor((summ/contribs.length)*10000)/100+'%)<br>')
+							.append('Longest streak: '+$.map(ls,function(d){return new Date(d).toUTCString()}).join(' - ')+': '+parseMsg(messages.days,(new Date(ls[1])-new Date(ls[0]))/86400000+1)+'<br>')
+							.append('Executed in '+parseMsg(messages.seconds,Math.floor((new Date().getTime()-editCounterInitDate.getTime())/10)/100)+'.');
+						});
 					});
 				});
 			});
