@@ -236,6 +236,24 @@ function getRights(callback){
 		'jsonp'
 	);
 }
+function getBlockInfo(callback){
+	$.get(
+		api,
+		{
+			action:'query',
+			format:'json',
+			list:'users',
+			ususers:user,
+			usprop:'blockinfo'
+		},
+		function(data){
+			var blk=data.query.users[0];
+			if(typeof blk.blockid!='undefined') callback(blk);
+			else callback({});
+		},
+		'jsonp'
+	);
+}
 function getVotes(callback){
 	var polls={
 		'Wikivoyage/Logo/2013/R1/Results/JSON':'2013 Wikivoyage logo elections - 1st round',
@@ -772,17 +790,20 @@ function init(){
 							];
 						}));
 						getUploads(function(uploads){
-							$('#general')
-							.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
-							.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
-							.append('Live edits: '+contribs.length.toLocaleString()+'<br>')
-							.append(typeof editcount=='undefined'?[]:['Deleted edits: '+(editcount-contribs.length).toLocaleString(),'<br>',
-							'<b>Total edits (including deleted): '+editcount.toLocaleString()+'</b>','<br>'])
-							.append('<a href="'+wikipath+'Special:Log/upload?user='+user+'">'+messages['statistics-files']+'</a>: '+uploads.length.toLocaleString()+'<br>')
-							.append('Edits with non-empty summary: '+summ.toLocaleString()+' ('+
-							Math.floor((summ/contribs.length)*10000)/100+'%)<br>')
-							.append('Longest streak: '+$.map(ls,function(d){return new Date(d).toUTCString()}).join(' - ')+': '+parseMsg(messages.days,(new Date(ls[1])-new Date(ls[0]))/86400000+1)+'<br>')
-							.append('Executed in '+parseMsg(messages.seconds,Math.floor((new Date().getTime()-editCounterInitDate.getTime())/10)/100)+'.');
+							getBlockInfo(function(blockinfo){
+								$('#general')
+								.append(blockinfo.blockid!='undefined'?('<strong>Currently blocked by '+blockinfo.blockedby+' with an expiry time of '+blockinfo.blockexpiry+' because "<i>'+blockinfo.blockreason+'</i>"<br>'):'')
+								.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
+								.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
+								.append('Live edits: '+contribs.length.toLocaleString()+'<br>')
+								.append(typeof editcount=='undefined'?[]:['Deleted edits: '+(editcount-contribs.length).toLocaleString(),'<br>',
+								'<b>Total edits (including deleted): '+editcount.toLocaleString()+'</b>','<br>'])
+								.append('<a href="'+wikipath+'Special:Log/upload?user='+user+'">'+messages['statistics-files']+'</a>: '+uploads.length.toLocaleString()+'<br>')
+								.append('Edits with non-empty summary: '+summ.toLocaleString()+' ('+
+								Math.floor((summ/contribs.length)*10000)/100+'%)<br>')
+								.append('Longest streak: '+$.map(ls,function(d){return new Date(d).toUTCString()}).join(' - ')+': '+parseMsg(messages.days,(new Date(ls[1])-new Date(ls[0]))/86400000+1)+'<br>')
+								.append('Executed in '+parseMsg(messages.seconds,Math.floor((new Date().getTime()-editCounterInitDate.getTime())/10)/100)+'.');
+							});
 						});
 					});
 				});
