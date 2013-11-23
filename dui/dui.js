@@ -248,8 +248,7 @@ function getBlockInfo(callback){
 		},
 		function(data){
 			var blk=data.query.users[0];
-			if(typeof blk.blockid!='undefined') callback(blk);
-			else callback({});
+			callback(blk);
 		},
 		'jsonp'
 	);
@@ -792,7 +791,7 @@ function init(){
 						getUploads(function(uploads){
 							getBlockInfo(function(blockinfo){
 								$('#general')
-								.append(blockinfo.blockid!='undefined'?('<strong>Currently blocked by '+blockinfo.blockedby+' with an expiry time of '+blockinfo.blockexpiry+' because "<i>'+blockinfo.blockreason+'</i>"<br>'):'')
+								.append(typeof blockinfo.blockid!='undefined'?('<strong>Currently blocked by '+blockinfo.blockedby+' with an expiry time of '+blockinfo.blockexpiry+' because "<i>'+blockinfo.blockreason+'</i>"<br>'):'')
 								.append('<a href="'+wikipath+'?diff='+contribs[contribs.length-1].revid+'">First edit</a>: '+firstContribDate.toUTCString()+' ('+dateDiff(firstContribDate,new Date(),4,true)+')<br>')
 								.append('<a href="'+wikipath+'?diff='+contribs[0].revid+'">Most recent edit</a>: '+latestContribDate.toUTCString()+' ('+dateDiff(latestContribDate,new Date(),5,true)+')<br>')
 								.append('Live edits: '+contribs.length.toLocaleString()+'<br>')
