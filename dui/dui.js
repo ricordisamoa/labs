@@ -253,31 +253,12 @@ function getBlockInfo(callback){
 		'jsonp'
 	);
 }
-function getVotes(callback){
-	var polls={
-		'Wikivoyage/Logo/2013/R1/Results/JSON':'2013 Wikivoyage logo elections - 1st round',
-		'Wikivoyage/Logo/2013/R2/Results/JSON':'2013 Wikivoyage logo elections - 2nd round'
-	};
-	$.get(
-		'//meta.wikimedia.org/w/api.php',
-		{
-			action:'query',
-			format:'json',
-			titles:Object.keys(polls).join('|'),
-			prop:'revisions',
-			rvprop:'content'
-		},
-		function(data){
-			$.each(data.query.pages,function(pageid,page){
-				var votes=JSON.parse(page.revisions[0]['*'].replace(/^\<nowiki\>|\<\/nowiki\>$/g,''));
-				if(typeof votes[user]=='undefined') votes=[];
-				else votes=votes[user].votes.votesByTimestamp;
-				polls[page.title]={label:polls[page.title],votes:votes};
-			});
-			callback(polls);
-		},
-		'jsonp'
-	);
+function $getVotes() {
+	return $.getJSON('//tools.wmflabs.org/octodata/sucker.php', {
+		action: 'votelookup',
+		username: user,
+		groupby: 'ballot'
+	});
 }
 function getGeo(contribs,callback){
 	var occurr={};
@@ -774,16 +755,15 @@ function init(){
 					});
 					var ls=longestStreak(contribs),
 					summ=getSummaried(contribs).length;
-					getVotes(function(polls){
-						console.log(polls);
+					$getVotes().done(function(result) {
 						$('#votes')
-						.append($.map(polls,function(poll,page){
+						.append($.map(result.votelookup.ballots,function(poll){
 							return [
-								$('<h3>').append($('<a>',{'href':'//meta.wikimedia.org/wiki/'+page,'title':page}).text(poll.label)),
-								poll.votes.length>0?$('<ul>')
+								$('<h3>').append($('<a>',{'href': poll.b_url, 'title': poll.b_title}).text( poll.b_title )),
+								poll.votes.length>0 ? $('<ul>')
 								.append($.map(poll.votes,function(vote){
-									return $('<li>').text(new Date(vote.ts).toUTCString()+' - Voted for '+vote.candidate+' (')
-									.append($('<a>',{'href':'//meta.wikimedia.org/wiki/?diff='+vote.diff,'title':'diff '+vote.diff+' on Meta-Wiki'}).text('diff'))
+									return $('<li>').text(new Date(vote.vt_timestamp).toUTCString()+' - Voted for ' + vote.s_name +' (')
+									.append($('<a>',{'href': poll.b_project + '?diff=' + vote.vt_diff, 'title': 'diff ' + vote.vt_diff + ' on ' + poll.b_project}).text('diff'))
 									.append(')');
 								})):'Did not vote.'
 							];
