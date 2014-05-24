@@ -41,14 +41,14 @@ if($_GET['lang'] and $_GET['lang']!='en'){
 }
 $items=file_get_contents($api.http_build_query(
 	array(
-		action=>'query',
-		format=>'json',
-		generator=>'backlinks',
-		gblnamespace=>0,
-		gbllimit=>'max',
-		gbltitle=>'Property:P246',
-		gblfilterredir=>'nonredirects',
-		prop=>''
+		'action'=>'query',
+		'format'=>'json',
+		'generator'=>'backlinks',
+		'gblnamespace'=>0,
+		'gbllimit'=>'max',
+		'gbltitle'=>'Property:P246',
+		'gblfilterredir'=>'nonredirects',
+		'prop'=>''
 	)
 ));
 $titles=array();
@@ -58,11 +58,11 @@ $elements=array();
 while(count($titles)>0){
 	$data=file_get_contents($api.http_build_query(
 		array(
-			action=>'wbgetentities',
-			format=>'json',
-			ids=>implode(array_splice($titles,0,50),'|'),
-			props=>'labels|claims|descriptions',
-			languages=>implode($languages,'|')
+			'action'=>'wbgetentities',
+			'format'=>'json',
+			'ids'=>implode(array_splice($titles,0,50),'|'),
+			'props'=>'labels|claims|descriptions',
+			'languages'=>implode($languages,'|')
 		)
 	));
 	$data=json_decode($data,true);
@@ -82,9 +82,9 @@ foreach($elements as $id => $element){
 	$symbol=$element['claims']['P246'][0]['mainsnak']['datavalue']['value'];
 	$label=$element['labels'][$userlang]['value'];
 	$final[$num]=array(
-		symbol=>$symbol,
-		label=>$label,
-		id=>$id
+		'symbol'=>$symbol,
+		'label'=>$label,
+		'id'=>$id
 	);
 }
 ksort($final,SORT_NUMERIC);
