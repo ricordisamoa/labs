@@ -1,7 +1,7 @@
 /*
 
 Deep User Inspector (DUI)
-Copyright (C) 2013 Ricordisamoa
+Copyright (C) 2013-2014 Ricordisamoa
 
 meta.wikimedia.org/wiki/User:Ricordisamoa
 tools.wmflabs.org/ricordisamoa/
