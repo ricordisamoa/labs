@@ -167,7 +167,7 @@ function getUploads(callback,aistart){
 		'jsonp'
 	);
 }
-function getData(callback,ucstart){
+function getData(callback,cont){
 	var config={
 		action:'query',
 		format:'json',
@@ -176,7 +176,7 @@ function getData(callback,ucstart){
 		ucprop:'title|timestamp|comment|tags|ids|sizediff',
 		uclimit:'max'
 	};
-	if(typeof ucstart!='undefined'&&ucstart!='') config.ucstart=ucstart;
+	if(typeof cont!='undefined') $.extend(config, cont);
 	else{
 		config.list+='|users';
 		config.ususers=user;
@@ -188,8 +188,8 @@ function getData(callback,ucstart){
 		function(data){
 			contribs=contribs.concat(data.query.usercontribs);
 			if(data.query.users) editcount=data.query.users[Object.keys(data.query.users)[0]].editcount;
-			if(data['query-continue']&&data['query-continue'].usercontribs&&data['query-continue'].usercontribs.ucstart){
-				getData(callback,data['query-continue'].usercontribs.ucstart);
+			if(data['query-continue']&&data['query-continue'].usercontribs){
+				getData(callback,data['query-continue'].usercontribs);
 			}
 			else{
 				callback(contribs);
