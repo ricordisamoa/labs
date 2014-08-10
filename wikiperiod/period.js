@@ -14,7 +14,7 @@
 	You should have received a copy of the GNU General Public License
 	along with WikiPeriod.  If not, see <http://www.gnu.org/licenses/>.
 
-	A copy of the license is at COPYING.txt (in this directory).
+	A copy of the license is at LICENSE (in the parent directory).
 */
 wgUserLanguage=navigator.language;
 function getSymbol(claims){
