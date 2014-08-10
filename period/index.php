@@ -22,7 +22,7 @@
 <meta charset="utf-8">
 <title>WikiPeriod by Ricordisamoa</title>
 <link rel="shortcut icon" href="//upload.wikimedia.org/wikipedia/commons/thumb/a/af/Dmitri_Mendeleev.jpg/27px-Dmitri_Mendeleev.jpg">
-<link rel="canonical" href="https://tools.wmflabs.org/ricordisamoa/wikiperiod/">
+<link rel="canonical" href="https://tools.wmflabs.org/ricordisamoa/period/">
 <link rel="help" href="docs.html">
 <link rel="stylesheet" href="common.css">
 </head>
@@ -96,6 +96,6 @@ foreach($final as $num => $element){
 ?>
 </tr>
 </table>
-<a href="//github.com/ricordisamoa/labs/tree/master/wikiperiod"><img style="position: fixed; top: 0; right: 0; border: 0;" src="//s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+<a href="//github.com/ricordisamoa/labs/tree/master/period"><img style="position: fixed; top: 0; right: 0; border: 0;" src="//s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
 </body>
 </html>
