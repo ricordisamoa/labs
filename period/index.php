@@ -32,66 +32,82 @@
 <table id="period">
 <tr>
 <?php
-$api='http://www.wikidata.org/w/api.php?';
-$languages=array('en');
-$userlang='en';
-if($_GET['lang'] and $_GET['lang']!='en'){
-	$userlang=$_GET['lang'];
-	array_push($languages,$_GET['lang']);
+$api = 'http://www.wikidata.org/w/api.php?';
+$languages = array('en');
+$userlang = 'en';
+if ($_GET['lang'] and $_GET['lang'] != 'en') {
+	$userlang = $_GET['lang'];
+	array_push($languages, $_GET['lang']);
 }
-$items=file_get_contents($api.http_build_query(
-	array(
-		'action'=>'query',
-		'format'=>'json',
-		'generator'=>'backlinks',
-		'gblnamespace'=>0,
-		'gbllimit'=>'max',
-		'gbltitle'=>'Property:P246',
-		'gblfilterredir'=>'nonredirects',
-		'prop'=>''
-	)
-));
-$titles=array();
-$data=json_decode($items,true);
-foreach($data['query']['pages'] as $id => $item) array_push($titles,$item['title']);
-$elements=array();
-while(count($titles)>0){
-	$data=file_get_contents($api.http_build_query(
+$items = file_get_contents(
+	$api . http_build_query(
 		array(
-			'action'=>'wbgetentities',
-			'format'=>'json',
-			'ids'=>implode(array_splice($titles,0,50),'|'),
-			'props'=>'labels|claims|descriptions',
-			'languages'=>implode($languages,'|')
+			'action' => 'query',
+			'format' => 'json',
+			'generator' => 'backlinks',
+			'gblnamespace' => 0,
+			'gbllimit' => 'max',
+			'gbltitle' => 'Property:P246',
+			'gblfilterredir' => 'nonredirects',
+			'prop' => ''
 		)
-	));
-	$data=json_decode($data,true);
-	$elements=array_merge($elements,$data['entities']);
+	)
+);
+$titles = array();
+$data = json_decode($items, true);
+foreach ($data['query']['pages'] as $id => $item) {
+	array_push($titles, $item['title']);
 }
-$final=array();
-foreach($elements as $id => $element){
-	$link='//www.wikidata.org/wiki/'.$id;
-	$anchor='<a href="'.$link.'">'.$id.'</a>';
-	if(!array_key_exists('claims',$element)) die('Claims not found on '.$anchor.'!');
-	if(!array_key_exists('P246',$element['claims'])) die('Chemical symbol not found on '.$anchor.'!');
-	if(!array_key_exists('descriptions',$element)) die('Descriptions not found on '.$anchor.'!');
-	if(!array_key_exists('en',$element['descriptions'])) die('English description not found on '.$anchor.'!');
-	$desc=$element['descriptions']['en']['value'];
-	preg_match('/(chemical )?element with (an |the |)atomic number (of |)(\d+)\b/',$desc,$matches);
-	$num=intval($matches[4]);
-	$symbol=$element['claims']['P246'][0]['mainsnak']['datavalue']['value'];
-	$label=$element['labels'][$userlang]['value'];
-	$final[$num]=array(
-		'symbol'=>$symbol,
-		'label'=>$label,
-		'id'=>$id
+$elements = array();
+while (count($titles) > 0) {
+	$data = file_get_contents(
+		$api . http_build_query(
+			array(
+				'action' => 'wbgetentities',
+				'format' => 'json',
+				'ids' => implode(array_splice($titles, 0, 50), '|'),
+				'props' => 'labels|claims|descriptions',
+				'languages' => implode($languages, '|')
+			)
+		)
+	);
+	$data = json_decode($data, true);
+	$elements = array_merge($elements, $data['entities']);
+}
+$final = array();
+foreach ($elements as $id => $element) {
+	$link = '//www.wikidata.org/wiki/' . $id;
+	$anchor = '<a href="' . $link . '">' . $id . '</a>';
+	if (!array_key_exists('claims', $element)) {
+		die('Claims not found on ' . $anchor . '!');
+	}
+	if (!array_key_exists('P246', $element['claims'])) {
+		die('Chemical symbol not found on ' . $anchor . '!');
+	}
+	if (!array_key_exists('descriptions', $element)) {
+		die('Descriptions not found on ' . $anchor . '!');
+	}
+	if (!array_key_exists('en', $element['descriptions'])) {
+		die('English description not found on ' . $anchor . '!');
+	}
+	$desc = $element['descriptions']['en']['value'];
+	preg_match('/(chemical )?element with (an |the |)atomic number (of |)(\d+)\b/', $desc, $matches);
+	$num = intval($matches[4]);
+	$symbol = $element['claims']['P246'][0]['mainsnak']['datavalue']['value'];
+	$label = $element['labels'][$userlang]['value'];
+	$final[$num] = array(
+		'symbol' => $symbol,
+		'label' => $label,
+		'id' => $id
 	);
 }
-ksort($final,SORT_NUMERIC);
-foreach($final as $num => $element){
-	$link='//www.wikidata.org/wiki/'.$element['id'];
-	echo '<td><span>',$element['symbol'],'</span><br/><a href="',$link,'">',$element['label'],'</a><br/>',$num,'</td>';
-	if($num%12===0) echo '</tr><tr>';
+ksort($final, SORT_NUMERIC);
+foreach ($final as $num => $element) {
+	$link = '//www.wikidata.org/wiki/' . $element['id'];
+	echo '<td><span>' . $element['symbol'] . '</span><br/><a href="' . $link . '">' . $element['label'] . '</a><br/>' . $num . '</td>';
+	if ($num % 12 === 0) {
+		echo '</tr><tr>';
+	}
 }
 ?>
 </tr>
