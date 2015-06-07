@@ -22,12 +22,12 @@
 <meta charset="utf-8">
 <title>GeoContribs</title>
 <link href="//upload.wikimedia.org/wikipedia/commons/f/fe/Crystal_Clear_app_browser.png" rel="shortcut icon" type="image/png">
-<link rel="stylesheet" href="../lib/leaflet/leaflet.css">
+<link rel="stylesheet" href="//tools-static.wmflabs.org/cdnjs/ajax/libs/leaflet/0.6.4/leaflet.min.css">
 <!--[if lte IE 8]>
-     <link rel="stylesheet" href="../lib/leaflet/leaflet.ie.css" />
+     <link rel="stylesheet" href="//tools-static.wmflabs.org/cdnjs/ajax/libs/leaflet/0.6.4/leaflet.ie.min.css" />
 <![endif]-->
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script type="text/javascript" src="../lib/leaflet/leaflet.js"></script>
+<script type="text/javascript" src="//tools-static.wmflabs.org/cdnjs/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="//tools-static.wmflabs.org/cdnjs/ajax/libs/leaflet/0.6.4/leaflet.js"></script>
 <style type="text/css">
 .mw-plusminus-pos{
 	color:#006400;
