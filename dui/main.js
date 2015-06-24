@@ -139,7 +139,7 @@ function getNamespaces(callback){
 		'jsonp'
 	);
 }
-function getUploads(callback,aistart){
+function getUploads(callback,cont){
 	$.get(
 		api,
 		$.extend(
@@ -152,14 +152,14 @@ function getUploads(callback,aistart){
 				aiuser:user,
 				ailimit:'max'
 			},
-			(aistart&&typeof(aistart)!='undefined'&&aistart!=''?{aistart:aistart}:{})
+			(cont||{'continue':''})
 		),
 		function(data){
 			uploads=uploads.concat($.map(data.query.allimages,function(e){
 				return [e.name.replace(/_/g,' ')];
 			}));
-			if(data['query-continue']&&data['query-continue'].allimages&&data['query-continue'].allimages.aistart){
-				getUploads(user,callback,data['query-continue'].allimages.aistart);
+			if(data.continue){
+				getUploads(callback,data.continue);
 			}
 			else{
 				callback(uploads);
@@ -183,6 +183,7 @@ function getData(callback,cont){
 		config.list+='|users';
 		config.ususers=user;
 		config.usprop='editcount';
+		config.continue='';
 	}
 	$.get(
 		api,
@@ -190,8 +191,8 @@ function getData(callback,cont){
 		function(data){
 			contribs=contribs.concat(data.query.usercontribs);
 			if(data.query.users) editcount=data.query.users[Object.keys(data.query.users)[0]].editcount;
-			if(data['query-continue']&&data['query-continue'].usercontribs){
-				getData(callback,data['query-continue'].usercontribs);
+			if(data.continue){
+				getData(callback,data.continue);
 			}
 			else{
 				callback(contribs);
